@@ -1,11 +1,12 @@
 import hashlib
-import dns.resolver
 import logging
+
+import dns
 
 log = logging.getLogger(__name__)
 
 
-def check (participantid):
+def check(participantid):
     '''
     Checks whether the given participant id exists in the SML by doing an DNS lookup
     returns true if so otherwise false
@@ -13,12 +14,8 @@ def check (participantid):
 
     # Calculate the hash of the ID according to the SML specification
     # peppol needs the organisation to be lower case
-
-
     hash = hashlib.md5(str.lower(participantid).encode('UTF-8')).hexdigest()
-
     hostname = "b-" + hash + ".iso6523-actorid-upis.edelivery.tech.ec.europa.eu"
-
     log.debug('Hostname to resolve %s', hostname)
 
     # Look up the hostname in the SML; if the lookup succeeds, we know
@@ -27,9 +24,9 @@ def check (participantid):
     # endpoint details.
     resolver = dns.resolver.Resolver()
     try:
-        answers= resolver.query(hostname, "A")
+        answers = resolver.query(hostname, "A")
     except dns.resolver.NXDOMAIN:
-        log.error("Got NXDOMAIN for %s",hostname)
+        log.error("Got NXDOMAIN for %s", hostname)
         return False
 
     for rdata in answers:
@@ -40,4 +37,3 @@ def check (participantid):
         return True
     else:
         return False
-

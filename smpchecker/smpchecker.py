@@ -1,7 +1,8 @@
 import os
-from sqlite3 import dbapi2 as sqlite3
-from flask import Flask, request, session, g, redirect, url_for, abort, \
-     render_template, flash
+import sqlite3
+
+from flask import Flask, request, session, g, redirect, url_for, render_template, flash
+
 from smpchecker.sml import smlchecker
 
 app = Flask(__name__)  # create the application instance :)
@@ -66,7 +67,7 @@ def check():
     if smlchecker.check(request.form['participantid']):
         flash('Participant Identifier found in SML')
     else:
-        flash('Participant Identifier not found in SML',category='errormessage')
+        flash('Participant Identifier not found in SML', category='errormessage')
     return redirect(url_for('index'))
 
 
@@ -90,6 +91,3 @@ def logout():
     session.pop('logged_in', None)
     flash('You were logged out')
     return redirect(url_for('index'))
-
-
-

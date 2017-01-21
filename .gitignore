@@ -1,2 +1,13 @@
-*.egg-info
+# IDE
 .idea
+
+# Python
+__pycache__/
+*.py[cod]
+
+# Distribution
+*.egg-info
+dist/
+
+# Application
+smpchecker.db
