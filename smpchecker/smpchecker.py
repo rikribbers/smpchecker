@@ -4,6 +4,8 @@ import sqlite3
 from flask import Flask, request, session, g, redirect, url_for, render_template, flash
 
 from smpchecker.sml import smlchecker
+from smpchecker.accesspoint import apscanner
+from smpchecker.model import model
 
 app = Flask(__name__)  # create the application instance :)
 app.config.from_object(__name__)  # load config from this file , smpchecker.py
@@ -12,7 +14,7 @@ app.config.from_object(__name__)  # load config from this file , smpchecker.py
 app.config.update(dict(
     DATABASE=os.path.join(app.root_path, 'smpchecker.db'),
     SECRET_KEY='development key',
-    USERNAME='admin',
+    USERNAME='rik.ribbers@sidn.nl',
     PASSWORD='default'
 ))
 
@@ -50,6 +52,15 @@ def get_db():
     return g.sqlite_db
 
 
+def query_db(query, args=(), one=False):
+    db= get_db()
+    cur =db.execute(query, args)
+    rv = cur.fetchall()
+    cur.close()
+    db.commit()
+    return (rv[0] if rv else None) if one else rv
+
+
 @app.teardown_appcontext
 def close_db(error):
     """Closes the database again at the end of the request."""
@@ -62,22 +73,46 @@ def index():
     return render_template('index.html')
 
 
-@app.route('/check', methods=['POST'])
-def check():
-    if smlchecker.check(request.form['participantid']):
-        flash('Participant Identifier found in SML')
+@app.route('/check_peppol', methods=['POST'])
+def check_peppol():
+    error=None
+    if smlchecker.check(request.form['peppolid']):
+        flash('PEPPOL Identifier found in SML')
+        apscanner.scan(request.form['peppolid'])
+
     else:
-        flash('Participant Identifier not found in SML', category='errormessage')
-    return redirect(url_for('index'))
+        error = 'PEPPOL Identifier not found in SML'
+
+    p = model.PeppolMember(request.form['peppolid'])
+    p.reload()
+    results = p.get_smpentries()
+    return render_template("index.html", error=error, results=results, peppolid=p.peppolidentifier)
+
+@app.route('/check_business', methods=['POST'])
+def check_business():
+    error=None
+    peppolid=request.form['optradio']+':'+request.form['businessid']
+    print(peppolid)
+    if smlchecker.check(peppolid):
+        flash('PEPPOL Identifier found in SML')
+        apscanner.scan(peppolid)
+
+    else:
+        error = 'PEPPOL Identifier not found in SML'
+
+    p = model.PeppolMember(peppolid)
+    p.reload()
+    results = p.get_smpentries()
+    return render_template("index.html", error=error, results=results, peppolid=p.peppolidentifier)
 
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
     error = None
     if request.method == 'POST':
-        if request.form['username'] != app.config['USERNAME']:
+        if request.form['inputEmail'] != app.config['USERNAME']:
             error = 'Invalid username'
-        elif request.form['password'] != app.config['PASSWORD']:
+        elif request.form['inputPassword'] != app.config['PASSWORD']:
             error = 'Invalid password'
         else:
             session['logged_in'] = True

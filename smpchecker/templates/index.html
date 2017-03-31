@@ -1,15 +1,53 @@
 {% extends "layout.html" %}
 {% block body %}
+<div class="panel panel-default">
+    <div class="panel-body">
 
-  {% if session.logged_in %}
-  <p>You are now logged in, use your powers wisely</p>
-  {% endif %}
-    <form action="{{ url_for('check') }}" method=post class=check-entry>
-      <dl>
-        <dt>Participant Identifier:
-        <dd><input type=text size=30 name=participantid>
-        <dd><input type=submit value=Check>
-      </dl>
-    </form>
+        <div class="row">
+            <form action="{{ url_for('check_peppol') }}" method=post class=check-entry>
+                <div class="input-group">
+                    <input name=peppolid type="text" class="form-control" placeholder="PEPPOL Identifier">
+                    <span class="input-group-btn"><button class="btn btn-default" type="submit">Go!</button></span>
+                </div><!-- /input-group -->
+            </form>
+        </div>
+        <div class="row">
+            <form action="{{ url_for('check_business') }}" method=post class=check-entry>
+                <label class="radio-inline"><input type="radio" name="optradio" value="0106">NL:KVK (0106)</label>
+                <label class="radio-inline"><input type="radio" name="optradio" value="9944">NL:VAT (9944)</label>
+                <label class="radio-inline"><input type="radio" name="optradio" value="9954">NL:OIN (9954)</label>
 
+                <div class="input-group">
+                    <input name=businessid type="text" class="form-control" placeholder="Business identifier">
+                    <span class="input-group-btn"><button class="btn btn-default" type="submit">Go!</button></span>
+                </div><!-- /input-group -->
+            </form>
+        </div>
+    </div>
+</div>
+
+{% if results %}
+
+<div class="panel panel-primary">
+    <!-- Default panel contents -->
+    <div class="panel-heading">Results for {{ peppolid }}</div>
+    <!-- Table -->
+    <div>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>Document Type</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for result in results %}
+            <tr>
+                <td>{{ result.documentidentifier }}</td>
+            </tr>
+            {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endif %}
 {% endblock %}

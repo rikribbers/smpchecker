@@ -1,6 +1,6 @@
 from setuptools import setup, find_packages
 
-setup(name='smpsmlchecker',
+setup(name='smpchecker',
       version='0.1',
       description='Tool for checking SML/SMP entries',
       author='Rik Ribbers',
@@ -8,7 +8,9 @@ setup(name='smpsmlchecker',
       url='https://github.com/rikribbers/smpchecker',
       install_requires=[
           'flask',
-          'dnspython'
+          'dnspython',
+          'requests',
+          'cryptography'
       ],
       packages=find_packages(),
       include_package_data=True,
