@@ -1,10 +1,13 @@
 import logging
 import requests
+import csv
 import xml.etree.ElementTree as Et
 from cryptography import x509
 from cryptography.hazmat.backends import default_backend
 from smpchecker.sml import smlchecker
 from smpchecker.model import model
+from smpchecker.smp import smpscanner
+
 
 log = logging.getLogger(__name__)
 
@@ -15,26 +18,27 @@ ns = {'pub': 'http://busdox.org/serviceMetadata/publishing/1.0/',
 begin_certificate = "-----BEGIN CERTIFICATE-----\n"
 end_certificate = "\n-----END CERTIFICATE-----"
 
-def scan(peppoid):
+def scan(peppolid):
     '''
 
-    Scans an accesspoint for a specific PEPPOL identifier. Assumes that the peppol member is registred in SML
+    Scans an smp for a specific PEPPOL identifier. Assumes that the peppol member is registred in SML
 
-    :param peppoid: PEPPOL identifier
+    :param peppolid: PEPPOL identifier
     :return:
     '''
 
-    p = model.PeppolMember(peppoid)
+    log.info('Scanning peppolid='+peppolid)
+
+    p = model.PeppolMember(peppolid)
     if p.exists() is False:
         p.create()
     else:
-        p.load(peppoid)
+        p.load(peppolid)
         p.update()
 
-    print(p.peppolidentifier)
     ir = requests.get("http://"+smlchecker.hostname(p.peppolidentifier)+"/iso6523-actorid-upis::"+p.peppolidentifier)
 
-    log.debug(' ----- ServiceGroup for: %s -----', peppoid)
+    log.debug(' ----- ServiceGroup for: %s -----', peppolid)
     log.debug(ir.text)
     log.debug(' -------------------------------------------')
 
@@ -55,9 +59,7 @@ def scan(peppoid):
         else :
             url= 'http://' + href
 
-        print(url)
         scan_servicemetadata(url, p)
-
 
 
 def scan_servicemetadata(url, member):
@@ -106,3 +108,30 @@ def scan_servicemetadata(url, member):
                 entry.load(documenttype, member.id)
                 entry.update()
 
+
+def readfile(filename, businessidentifier):
+    log.debug('Opening file:'+filename)
+    with open(filename) as csvfile:
+        dialect = csv.Sniffer().sniff(csvfile.read(1024))
+        csvfile.seek(0)
+        reader = csv.reader(csvfile, dialect)
+        results=[]
+        for row in reader:
+            if businessidentifier == 'PEPPOL':
+                peppolid = row[0]
+            else:
+                peppolid = businessidentifier + ':' + row[0]
+
+            if smlchecker.check(peppolid):
+                smpscanner.scan(peppolid)
+                p = model.PeppolMember(peppolid)
+                p.reload()
+                result = p.get_scan_result()
+                results.append(result)
+            else:
+                # create a dummy result; not found
+                p = model.PeppolMember(row[0])
+                result = model.SMPScanResult(p,[])
+                results.append(result)
+
+        return results

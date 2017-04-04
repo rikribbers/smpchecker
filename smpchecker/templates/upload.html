@@ -1,0 +1,139 @@
+{% extends "layout.html" %}
+{% block body %}
+
+<!-- example fileselect from: https://codepen.io/claviska/pen/vAgmd -->
+<script type="">
+$(function() {
+
+  // We can attach the `fileselect` event to all file inputs on the page
+  $(document).on('change', ':file', function() {
+    var input = $(this),
+        numFiles = input.get(0).files ? input.get(0).files.length : 1,
+        label = input.val().replace(/\\/g, '/').replace(/.*\//, '');
+    input.trigger('fileselect', [numFiles, label]);
+  });
+  // We can watch for our custom `fileselect` event like this
+  $(document).ready( function() {
+      $(':file').on('fileselect', function(event, numFiles, label) {
+
+          var input = $(this).parents('.input-group').find(':text'),
+              log = numFiles > 1 ? numFiles + ' files selected' : label;
+
+          if( input.length ) {
+              input.val(log);
+          } else {
+              if( log ) alert(log);
+          }
+
+      });
+  });
+});
+
+
+
+
+</script>
+
+<div class="panel panel-default">
+    <div class="panel-body">
+        <div class="row">
+            <form action="{{ url_for('upload') }}" method=post enctype=multipart/form-data class=check-entry>
+                <label class="radio-inline"><input checked type="radio" name="optradio" value="0106">NL:KVK
+                    (0106)</label>
+                <label class="radio-inline"><input type="radio" name="optradio" value="9944">NL:VAT (9944)</label>
+                <label class="radio-inline"><input type="radio" name="optradio" value="9954">NL:OIN (9954)</label>
+                <label class="radio-inline"><input type="radio" name="optradio" value="PEPPOL">PEPPOL Identifier</label>
+
+                <div class="input-group">
+
+                    <label class="input-group-btn">
+                    <span class="btn btn-default">
+                        Browse&hellip; <input name=file type="file" style="display: none;" multiple>
+                    </span>
+                    </label>
+                    <input type="text" class="form-control" readonly placeholder="Select a file...">
+                </div>
+                <button class="btn btn-default" type="submit">Go!</button>
+            </form>
+        </div>
+    </div>
+</div>
+
+
+{% if results %}
+
+<div class="panel panel-primary">
+    <!-- Default panel contents -->
+    <div class="panel-heading">Results for {{ peppolid }}</div>
+    <!-- Table -->
+    <div>
+        <table class="table">
+            <thead>
+            <tr>
+                <th>PEPPOL Identifier</th>
+                <th>SI-UBL 1.0 CreditNote</th>
+                <th>SI-UBL 1.0 Invoice</th>
+                <th>SI-UBL 1.1</th>
+                <th>SI-UBL 1.2</th>
+                <th>PEPPOL 4a</th>
+            </tr>
+            </thead>
+            <tbody>
+            {% for result in results %}
+            <tr>
+                <td>{{ result.peppolidentifier }}</td>
+                <td>
+                    <div class="btn-group" role="group">
+                        {% if result.si_10_creditnote %}
+                        <button type="button" class="btn btn-success disabled">Yes</button>
+                        {% else %}
+                        <button type="button" class="btn btn-danger disabled">No</button>
+                        {% endif %}
+                    </div>
+                </td>
+                <td>
+                    <div class="btn-group" role="group">
+                        {% if result.si_10_invoice %}
+                        <button type="button" class="btn btn-success disabled">Yes</button>
+                        {% else %}
+                        <button type="button" class="btn btn-danger disabled">No</button>
+                        {% endif %}
+                    </div>
+                </td>
+                <td>
+                    <div class="btn-group" role="group">
+                        {% if result.si_11 %}
+                        <button type="button" class="btn btn-success disabled">Yes</button>
+                        {% else %}
+                        <button type="button" class="btn btn-danger disabled">No</button>
+                        {% endif %}
+                    </div>
+                </td>
+                <td>
+                    <div class="btn-group" role="group">
+                        {% if result.si_12 %}
+                        <button type="button" class="btn btn-success disabled">Yes</button>
+                        {% else %}
+                        <button type="button" class="btn btn-danger disabled">No</button>
+                        {% endif %}
+                    </div>
+                </td>
+                <td>
+                    <div class="btn-group" role="group">
+                        {% if result.peppol4a %}
+                        <button type="button" class="btn btn-success disabled">Yes</button>
+                        {% else %}
+                        <button type="button" class="btn btn-danger disabled">No</button>
+                        {% endif %}
+                    </div>
+                <td>
+    </div>
+    </td>
+    </tr>
+    {% endfor %}
+    </tbody>
+    </table>
+</div>
+</div>
+{% endif %}
+{% endblock %}
