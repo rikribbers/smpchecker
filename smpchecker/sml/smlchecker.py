@@ -32,7 +32,6 @@ def smpaddress(peppoid):
 
     h = hostname(peppoid)
     log.debug('Hostname to resolve %s', h)
-    print (h)
     # Look up the hostname in the SML; if the lookup succeeds, we know
     # there is an SMP for this organization, and we are done.
     # Normally, the calling application would then contact the SMP for

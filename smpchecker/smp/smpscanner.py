@@ -95,8 +95,8 @@ def scan_servicemetadata(url, member):
 
             c = begin_certificate + certificate.text + end_certificate
             cert = x509.load_pem_x509_certificate(c.encode(), default_backend())
-            entry.certificate_not_after = cert.not_valid_before
-            entry.certificate_not_before = cert.not_valid_after
+            entry.certificate_not_before= cert.not_valid_before
+            entry.certificate_not_after = cert.not_valid_after
             #for s in cert.subject:
              #   print(s.oid)
                 #if s.oid.name = 'commonName':

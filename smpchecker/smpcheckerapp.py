@@ -9,7 +9,7 @@ from smpchecker.model import model
 from smpchecker.sml import smlchecker
 
 app = Flask(__name__)  # create the application instance :)
-app.config.from_object(__name__)  # load config from this file , smpchecker.py
+app.config.from_object(__name__)  # load config from this file , smpcheckerapp.py
 
 # Load default config and override config from an environment variable
 app.config.update(dict(
@@ -164,3 +164,9 @@ def get_participant(peppol_id):
         p.reload()
 
     return jsonify(p.serialize())
+
+@app.route('/api/acesspoint', methods=['GET'])
+def get_accesspoint():
+    ap = model.AccessPoints()
+    result = ap.load()
+    return jsonify(accesspoints=[a.serialize() for a in result.accesspoints])

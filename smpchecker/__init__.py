@@ -1,1 +1,1 @@
-from .smpchecker import app
+from .smpcheckerapp import app

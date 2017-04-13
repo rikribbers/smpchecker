@@ -71,12 +71,14 @@
             <thead>
             <tr>
                 <th>Document Types</th>
+                <th>Endpoint URL</th>
             </tr>
             </thead>
             <tbody>
             {% for smp in result.smpentries%}
             <tr>
                 <td>{{ smp.documentidentifier }}</td>
+                <td>{{ smp.endpointurl }}</td>
             </tr>
             {% endfor %}
             </tbody>

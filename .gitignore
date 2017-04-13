@@ -11,3 +11,6 @@ dist/
 
 # Application
 smpchecker.db
+.cache/
+.tox/
+

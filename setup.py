@@ -12,6 +12,13 @@ setup(name='smpchecker',
           'requests',
           'cryptography'
       ],
+      # test_requires=[
+      #     'nose_parameterized',
+      # ],
       packages=find_packages(),
       include_package_data=True,
       )
+
+
+
+

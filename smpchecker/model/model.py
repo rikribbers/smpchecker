@@ -1,4 +1,4 @@
-from smpchecker import smpchecker as smpchecker
+from smpchecker import smpcheckerapp as smpchecker
 from enum import Enum
 from datetime import datetime
 
@@ -71,6 +71,7 @@ class PeppolMember:
             'firstseen': self.firstseen,
             'lastseen': self.lastseen,
         }
+
 
 class SMPEntry:
     '''
@@ -154,3 +155,28 @@ class SMPScanResult:
                 self.si_11 = True
             elif SupportedDocumentTypes.PEPPOL_4A.value == smpentry.documentidentifier:
                 self.si_11 = True
+
+
+class Accesspoint:
+    def __init__(self, endpointurl, certificate_not_after):
+        self.endpointurl = endpointurl,
+        self.certificate_not_after = certificate_not_after
+
+    def serialize(self):
+        return {
+            'endpointurl': self.endpointurl,
+            'certificate_not_after': self.certificate_not_after,
+        }
+
+
+class Accesspoints:
+    def __init__(self):
+        self.accesspoints = None
+
+    def load(self):
+        sql = 'select distinct endpointurl,certificate_not_after from smpentries'
+        rows = smpchecker.query_db(sql)
+
+        for row in rows:
+            a = Accesspoint(row[0], row[2])
+            self.accesspoints.append(a)
