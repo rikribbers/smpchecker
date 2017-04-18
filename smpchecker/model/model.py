@@ -38,8 +38,10 @@ class PeppolMember:
             row = rows.pop(0)
             self.id = row[0]
             self.peppolidentifier = row[1]
-            self.firstseen = row[2]
-            self.lastseen = row[3]
+            if row[2] is not None:
+                self.firstseen = datetime.strptime(row[2],'%Y-%m-%d %H:%M:%S.%f')
+            if row[3] is not None:
+                self.lastseen = datetime.strptime(row[3],'%Y-%m-%d %H:%M:%S.%f')
 
     def exists(self):
         for row in smpchecker.query_db('select id from peppolmembers where peppolidentifier=?',
@@ -109,12 +111,14 @@ class SMPEntry:
             row = rows.pop(0)
             self.id = row[0]
             self.documentidentifier = row[1]
-            self.certificate_not_before = row[2]
-            self.certificate_not_after = row[3]
+            self.certificate_not_before = datetime.strptime(row[2],'%Y-%m-%d %H:%M:%S.%f')
+            self.certificate_not_after = datetime.strptime(row[3],'%Y-%m-%d %H:%M:%S.%f')
             self.endpointurl = row[4]
             self.peppolmember_id = row[5]
-            self.firstseen = row[6]
-            self.lastseen = row[7]
+            if row[6] is not None:
+                self.firstseen = datetime.strptime(row[6],'%Y-%m-%d %H:%M:%S.%f')
+            if row[7] is not None:
+                self.lastseen = datetime.strptime(row[7],'%Y-%m-%d %H:%M:%S.%f')
 
     def exists(self):
         for row in smpchecker.query_db('select id from smpentries where peppolmember_id=? and documentidentifier=?',

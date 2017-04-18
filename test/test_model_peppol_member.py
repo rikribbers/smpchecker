@@ -55,10 +55,6 @@ class TestPeppolMember(unittest.TestCase):
         p1 = model.PeppolMember('pepid_reload')
         p1.create()
         p2 = model.PeppolMember('pepid_reload_dummy')
-        # Test reload should through non exists exception
-        #TODO catch proper exception
-        with self.assertRaises(FileNotFoundError):
-            p2.reload()
         # Overwrite p2 peppolid, reload and compare to p1
         p2.peppolidentifier = p1.peppolidentifier
         p2.reload()
