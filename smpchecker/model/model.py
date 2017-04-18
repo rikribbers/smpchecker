@@ -152,9 +152,9 @@ class SMPScanResult:
             elif SupportedDocumentTypes.SI_11.value == smpentry.documentidentifier:
                 self.si_11 = True
             elif SupportedDocumentTypes.SI_12.value == smpentry.documentidentifier:
-                self.si_11 = True
+                self.si_12 = True
             elif SupportedDocumentTypes.PEPPOL_4A.value == smpentry.documentidentifier:
-                self.si_11 = True
+                self.peppol4a = True
 
 
 class Accesspoint:
